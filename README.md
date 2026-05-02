@@ -179,3 +179,215 @@ public class ClientDemo
 
  </dependencies>
 </project>
+
+
+
+
+
+// Project Structure
+// src/main/java/com/klef/fsad/exam
+// ├── FsadEndExamApplication.java
+// ├── model/SupplierOrder.java
+// ├── repository/SupplierOrderRepository.java
+// ├── service/SupplierOrderService.java
+// ├── controller/SupplierOrderController.java
+
+// ===============================
+// 1. FsadEndExamApplication.java
+// ===============================
+package com.klef.fsad.exam;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class FsadEndExamApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(FsadEndExamApplication.class, args);
+    }
+}
+
+
+// ===============================
+// 2. model/SupplierOrder.java
+// ===============================
+package com.klef.fsad.exam.model;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "supplier_order")
+public class SupplierOrder 
+{
+    @Id
+    private int supplierOrderId;   // Manual ID
+
+    private String name;
+    private String date;
+    private String status;
+    private double amount;
+    private String productName;
+
+    // Getters and Setters
+    public int getSupplierOrderId() {
+        return supplierOrderId;
+    }
+
+    public void setSupplierOrderId(int supplierOrderId) {
+        this.supplierOrderId = supplierOrderId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+}
+
+
+// =======================================
+// 3. repository/SupplierOrderRepository.java
+// =======================================
+package com.klef.fsad.exam.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import com.klef.fsad.exam.model.SupplierOrder;
+
+public interface SupplierOrderRepository extends JpaRepository<SupplierOrder, Integer> 
+{
+}
+
+
+// ===================================
+// 4. service/SupplierOrderService.java
+// ===================================
+package com.klef.fsad.exam.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.klef.fsad.exam.model.SupplierOrder;
+import com.klef.fsad.exam.repository.SupplierOrderRepository;
+
+@Service
+public class SupplierOrderService 
+{
+    @Autowired
+    private SupplierOrderRepository repo;
+
+    // Add SupplierOrder
+    public SupplierOrder addOrder(SupplierOrder order) {
+        return repo.save(order);
+    }
+
+    // Second GET Operation
+    public List<SupplierOrder> viewAllOrders() {
+        return repo.findAll();
+    }
+}
+
+
+// =======================================
+// 5. controller/SupplierOrderController.java
+// =======================================
+package com.klef.fsad.exam.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import com.klef.fsad.exam.model.SupplierOrder;
+import com.klef.fsad.exam.service.SupplierOrderService;
+
+@RestController
+@RequestMapping("/supplierorder")
+public class SupplierOrderController 
+{
+    @Autowired
+    private SupplierOrderService service;
+
+    // POST Request - Add SupplierOrder
+    @PostMapping("/add")
+    public SupplierOrder addOrder(@RequestBody SupplierOrder order) {
+        return service.addOrder(order);
+    }
+
+    // GET Request - View All Orders
+    @GetMapping("/viewall")
+    public List<SupplierOrder> viewAllOrders() {
+        return service.viewAllOrders();
+    }
+}
+
+
+// ===============================
+// 6. application.properties
+// ===============================
+spring.datasource.url=jdbc:mysql://localhost:3306/fsadendexam
+spring.datasource.username=root
+spring.datasource.password=yourpassword
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+server.port=8080
+
+
+// ===============================
+// POSTMAN TESTING
+// ===============================
+
+// 1. POST Request
+// URL: http://localhost:8080/supplierorder/add
+
+{
+   "supplierOrderId":101,
+   "name":"ABC Suppliers",
+   "date":"2026-05-02",
+   "status":"Pending",
+   "amount":5000,
+   "productName":"Laptops"
+}
+
+
+// 2. GET Request
+// URL: http://localhost:8080/supplierorder/viewall
